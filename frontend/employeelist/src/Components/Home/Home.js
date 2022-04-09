@@ -4,12 +4,11 @@ import { useEffect, useState } from 'react'
 const Home = () => {
     const baseurl = "http://localhost:41105/api/"
     const [employeeData, setEmployeeData] = useState([])
-    const [selectedID, setSelectedID] = useState(null)
+    const [formData, setFormData] = useState({employeeName: ""})
     
     useEffect(() => {
         getEmployees()
         
-        console.log('i am running')
     }, [])
     
     const getEmployees = () => {
@@ -46,6 +45,31 @@ const Home = () => {
             }
         })
     }
+
+    const addEmployee = () => {
+        //setEmployeeData(...employeeData, )
+        
+        fetch(baseurl+'Employee', {
+            method: 'POST',
+            headers:{
+                'Accept':'application/json',
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify({ 
+                employeeName: formData.employeeName
+                
+            })
+        })
+        .then(async res => {
+            try {
+                const data = await res.json()
+                console.log(data)
+            } catch (error) {
+                console.log('there was an error, ', error)
+            }
+        })
+    }
+
     
     return (
     <div className='bg-blue-100'>Home
@@ -74,7 +98,22 @@ const Home = () => {
             }
         </tbody>
     </table>
+            {
+                //employeeData.map((id) => (
+                //    <div key={id._id}> </div>
+                //)
+            }
+        <div>
+            <form onSubmit={(e) => addEmployee()} >
+                <label>
+                    Name:
+                    <input type='text' placeholder='' value={formData.employeeName} onChange={(e) => setFormData({employeeName: e.target.value})} />
+                </label>
+                <button name='submitbtn' type='submit'>Submit</button>
+            </form>
+        </div>
     </div>
+    
   )
 }
 
