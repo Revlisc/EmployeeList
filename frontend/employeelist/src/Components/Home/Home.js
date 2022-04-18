@@ -5,11 +5,13 @@ const Home = () => {
     const baseurl = "http://localhost:41105/api/"
     const [employeeData, setEmployeeData] = useState([])
     const [formData, setFormData] = useState({employeeName: ""})
+    const [edit, setEdit] = useState(false);
     
     useEffect(() => {
         getEmployees()
         
     }, [])
+
     
     const getEmployees = () => {
         fetch(baseurl+'Employee', {
@@ -68,6 +70,31 @@ const Home = () => {
                 console.log('there was an error, ', error)
             }
         })
+        getEmployees()
+    }
+
+    const editEmployee = (id) => {
+        setEdit(true);
+
+        fetch(baseurl+'Employee/'+id.EmployeeId, {
+            method: 'PUT',
+            headers: {
+                'Accept':'application/json',
+                'Content-Type': 'application/json',
+                
+            }
+        })
+        .then(async res => {
+            try {
+                const data = await res.json()
+                console.log(data)
+            } catch (error) {
+                console.log('there was an error', error)
+            }
+        })
+
+        setEdit(false)
+
     }
 
     
@@ -88,9 +115,20 @@ const Home = () => {
                         <td onClick={() => deleteEmployee(id.EmployeeId)}>
                             {id.EmployeeId}
                         </td>
-                        <td>
-                            {id.EmployeeName}
-                        </td>
+                        {
+                            !edit ?
+                            <td onClick={() => editEmployee(id)}>
+                                {id.EmployeeName}
+                            </td>  
+                            :
+                            <td >
+                                <form onSubmit={(e) => editEmployee(id)}>
+                                    <input type='text' placeholder={formData.employeeName} onChange={(e) => setFormData({employeeName: e.target.value})} />
+                                    <button name='submitbtn' type='submit'>Confirm</button>
+                                </form>
+                            </td>
+                        }
+                        
                     </tr>
                     
                     
